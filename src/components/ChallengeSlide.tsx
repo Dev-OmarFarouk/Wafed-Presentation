@@ -65,7 +65,7 @@ export function ChallengeSlide({
       </div>
 
       <div className="relative mt-4 grid flex-1 grid-cols-[minmax(0,1fr)_452px_minmax(0,1fr)] items-center gap-2">
-        <div className="flex flex-col items-start gap-4">
+        <div className="flex flex-col items-end gap-4">
           {rightItems.map((item, index) => renderItem(item, index * 2))}
         </div>
 
@@ -94,7 +94,7 @@ export function ChallengeSlide({
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-4">
+        <div className="flex flex-col items-start gap-4">
           {leftItems.map((item, index) => renderItem(item, index * 2 + 1))}
         </div>
       </div>

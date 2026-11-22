@@ -96,6 +96,7 @@ export function PersonaSlide({ persona, step }: { persona: Persona; step: number
                   ratio="4 / 5"
                   alt={`صورة ${persona.name}`}
                   className="rounded-[26px]"
+                  priority
                 />
                 <span
                   className="absolute right-4 top-4 rounded-full px-4 py-1.5 text-[17px] font-medium text-cream"

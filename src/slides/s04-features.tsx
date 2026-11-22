@@ -26,13 +26,13 @@ export default function FeaturesSlide({ step }: { step: number }) {
         </span>
       </div>
 
-      <div className="relative mt-6 grid flex-1 grid-cols-5 gap-3">
+      <div className="relative mt-6 grid flex-1 content-center grid-cols-5 gap-3">
         {features.map((feature, index) => {
           const active = step > index;
           return (
             <motion.article
               key={feature.id}
-              className="relative flex flex-col overflow-hidden rounded-[24px] border bg-[#fffdf8] px-5 py-5"
+              className="relative flex flex-col overflow-hidden rounded-[24px] border bg-[#fffdf8] px-4 py-4"
               initial={false}
               animate={{
                 opacity: active ? 1 : 0.3,

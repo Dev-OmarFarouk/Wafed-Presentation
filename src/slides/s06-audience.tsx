@@ -25,7 +25,7 @@ export default function AudienceSlide({ step }: { step: number }) {
         className="relative flex w-full flex-1 items-center justify-center"
         style={{ perspective: "1600px" }}
       >
-        <div className="relative flex items-center justify-center gap-[300px]">
+        <div className="relative flex items-center justify-center gap-[220px]">
           <motion.div
             initial={false}
             animate={{ x: shift, rotateY: met ? -4 : -10 }}
