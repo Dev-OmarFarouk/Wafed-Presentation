@@ -1,0 +1,63 @@
+/* ===== Wafed design tokens ===== */
+:root {
+  /* palette */
+  --gold: #ca9c5e;
+  --gold-600: #b8853f;
+  --gold-300: #e3cba1;
+  --gold-100: #f4e9d6;
+  --green: #0f5e58;
+  --green-deep: #0b4641;
+  --green-700: #147068;
+  --green-300: #7fb3ac;
+  --green-100: #e4efec;
+  --ink: #374151;
+  --ink-soft: #5c6673;
+  --cream: #fdfaf3;
+  --cream-2: #f8f2e6;
+  --cream-3: #f1e8d7;
+  --danger: #a4544a;
+
+  /* spacing */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+
+  /* radii */
+  --r-xs: 8px;
+  --r-sm: 14px;
+  --r-md: 22px;
+  --r-lg: 32px;
+  --r-xl: 44px;
+  --r-pill: 999px;
+
+  /* shadows (warm, never pure black) */
+  --shadow-xs: 0 2px 8px rgba(80, 56, 24, 0.06);
+  --shadow-sm: 0 10px 24px -12px rgba(80, 56, 24, 0.18);
+  --shadow-md: 0 22px 48px -24px rgba(68, 47, 20, 0.26);
+  --shadow-lg: 0 40px 90px -40px rgba(58, 40, 16, 0.32);
+  --shadow-gold: 0 24px 60px -30px rgba(202, 156, 94, 0.55);
+
+  /* motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 180ms;
+  --dur-med: 420ms;
+  --dur-slow: 800ms;
+
+  /* type scale on the 1920x1080 stage */
+  --fs-display: 96px;
+  --fs-h1: 76px;
+  --fs-h2: 56px;
+  --fs-h3: 40px;
+  --fs-lg: 32px;
+  --fs-md: 28px;
+  --fs-sm: 24px;
+  --fs-xs: 20px;
+}

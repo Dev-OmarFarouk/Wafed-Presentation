@@ -1,0 +1,408 @@
+@import "./theme/tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+  }
+
+  html {
+    background: var(--cream);
+  }
+
+  body {
+    font-family: "Tajawal", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--cream);
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--gold-300);
+    color: var(--green-deep);
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+  .stage-wrap {
+    position: fixed;
+    inset: 0;
+    background: var(--cream);
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  /*
+   * Absolute centering + negative margins (not flex/grid centering).
+   * A 1920x1080 box larger than the viewport gets clamped by the browser
+   * under flex/grid centering, which pushed the deck off screen.
+   */
+  .stage {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1920px;
+    height: 1080px;
+    margin-left: -960px;
+    margin-top: -540px;
+    transform-origin: center center;
+    background: var(--cream);
+    overflow: hidden;
+    isolation: isolate;
+    /* dragging a flow must never select the slide text */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .slide-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--cream);
+    will-change: transform, opacity, clip-path;
+  }
+
+  .slide-inner {
+    position: absolute;
+    inset: 0;
+    padding: 78px 96px 104px;
+    display: flex;
+    flex-direction: column;
+    /* Tajawal 400 reads thin at presentation distance; 500 keeps body copy crisp */
+    font-weight: 500;
+    letter-spacing: 0.002em;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--green);
+    background: var(--green-100);
+    border: 1px solid rgba(15, 94, 88, 0.12);
+    padding: 8px 20px;
+    border-radius: var(--r-pill);
+  }
+
+  .title-xl {
+    font-size: var(--fs-display);
+    line-height: 1.2;
+    font-weight: 700;
+    color: var(--green-deep);
+    letter-spacing: -0.01em;
+  }
+
+  .title-lg {
+    font-size: var(--fs-h1);
+    line-height: 1.32;
+    font-weight: 700;
+    color: var(--green-deep);
+  }
+
+  .title-md {
+    font-size: var(--fs-h2);
+    line-height: 1.24;
+    font-weight: 700;
+    color: var(--green-deep);
+  }
+
+  .title-sm {
+    font-size: var(--fs-h3);
+    line-height: 1.32;
+    font-weight: 500;
+    color: var(--green);
+  }
+
+  .lead {
+    font-size: var(--fs-lg);
+    line-height: 1.6;
+    font-weight: 400;
+    color: var(--ink-soft);
+  }
+
+  .body {
+    font-size: var(--fs-md);
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .small {
+    font-size: var(--fs-sm);
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  .card {
+    background: #fffdf8;
+    border: 1px solid rgba(15, 94, 88, 0.1);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card-soft {
+    background: rgba(255, 253, 248, 0.72);
+    border: 1px solid rgba(15, 94, 88, 0.08);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-xs);
+    backdrop-filter: blur(6px);
+  }
+
+  .gold-rule {
+    width: 96px;
+    height: 4px;
+    border-radius: var(--r-pill);
+    background: linear-gradient(90deg, var(--gold), var(--gold-300));
+  }
+
+  .gold-text {
+    color: var(--gold-600);
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px;
+    border-radius: var(--r-pill);
+    font-size: var(--fs-xs);
+    font-weight: 500;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .grain {
+    background-image: radial-gradient(rgba(15, 94, 88, 0.055) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+}
+
+/* ===== motion helpers ===== */
+@keyframes goldDrift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--drift, 0px), -150px, 0) scale(1.12);
+    opacity: 0;
+  }
+}
+
+.gold-dot {
+  background: radial-gradient(circle at 35% 35%, #f8ead0, #ca9c5e 62%, #b8853f);
+  animation: goldDrift var(--dur, 18s) linear var(--delay, 0s) infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-1.2deg);
+  }
+  50% {
+    transform: rotate(1.5deg);
+  }
+}
+
+.leaf-sway {
+  animation: sway 15s ease-in-out infinite;
+  transform-origin: 78% 18%;
+}
+
+.leaf-sway-slow {
+  animation: sway 21s ease-in-out infinite reverse;
+  transform-origin: 22% 82%;
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.floaty {
+  animation: floaty 7s ease-in-out infinite;
+}
+
+@keyframes softPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.soft-pulse {
+  animation: softPulse 3.4s ease-in-out infinite;
+}
+
+@keyframes glowSweep {
+  0% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+}
+
+.glow-sweep {
+  animation: glowSweep 3.2s ease-in-out infinite;
+}
+
+/*
+ * Keep the resting card FLAT (transform: none). A permanent 3D transform or
+ * will-change promotes the card to its own texture, and the small type inside
+ * gets rasterised once then rescaled with the stage — which reads blurry until
+ * something forces a re-raster. Flat at rest stays crisp; the tilt only exists
+ * while the pointer is on the card.
+ */
+.tilt-surface {
+  transform: none;
+  transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 480ms ease;
+}
+
+.tilt-surface:hover,
+.tilt-surface:focus-within {
+  transform: perspective(1200px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg))
+    translateY(var(--tilt-lift, -6px));
+}
+
+.fan-stage {
+  perspective: 1500px;
+  transform-style: preserve-3d;
+}
+
+.fan-card {
+  transform-origin: 50% 112%;
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 520ms ease;
+  will-change: transform;
+}
+
+/* ===== portrait phone hint ===== */
+.rotate-hint {
+  display: none;
+}
+
+@media (max-width: 920px) and (orientation: portrait) {
+  .rotate-hint {
+    position: absolute;
+    inset: 0;
+    z-index: 70;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    background: radial-gradient(circle at 50% 40%, #fffdf8, #fdfaf3 70%);
+    text-align: center;
+    padding: 40px;
+  }
+
+  .rotate-hint p {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--green-deep);
+    margin: 0;
+  }
+
+  .rotate-hint .rotate-sub {
+    font-size: 26px;
+    color: var(--ink-soft);
+  }
+
+  .rotate-phone {
+    width: 96px;
+    height: 158px;
+    border: 6px solid var(--green);
+    border-radius: 22px;
+    position: relative;
+    animation: turnPhone 3.2s ease-in-out infinite;
+  }
+
+  .rotate-phone span {
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    width: 26px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--gold);
+    transform: translateX(-50%);
+  }
+
+  @keyframes turnPhone {
+    0%,
+    18% {
+      transform: rotate(0deg);
+    }
+    45%,
+    80% {
+      transform: rotate(-90deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
