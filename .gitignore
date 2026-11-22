@@ -18,4 +18,4 @@ Thumbs.db
 .freebuff/
 .tmp/
 # reference materials (not needed to run the app)
-assets/
+/assets/
