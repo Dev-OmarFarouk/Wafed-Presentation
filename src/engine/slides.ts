@@ -42,7 +42,7 @@ export const slides: SlideDef[] = [
   define("solutions-b", "الحلول", 4, "parallax", loadSolutionsB),
   define("features", "الخصائص الأساسية", 6, "zoom", loadFeatures),
   define("overview", "نظرة على المشروع", 4, "parallax", loadOverview),
-  define("audience", "الفئة المستهدفة", 3, "circle", loadAudience),
+  define("audience", "الفئة المستهدفة", 2, "circle", loadAudience),
   define("persona-student", "صوت الطلاب", 7, "zoom", loadPersonaStudent),
   define("persona-owner", "صوت أصحاب السكن", 7, "parallax", loadPersonaOwner),
   define("swot", "تحليل SWOT", 5, "circle", loadSwot),
@@ -51,5 +51,5 @@ export const slides: SlideDef[] = [
   define("logo", "الشعار", 5, "zoom", loadLogo),
   define("journey-start", "مسار البداية", 8, "goldPath", loadJourneyStart),
   define("journey-student", "مسار الطالب", 9, "parallax", loadJourneyStudent),
-  define("journey-owner", "مسار المالك", 9, "zoom", loadJourneyOwner),
+  define("journey-owner", "مسار المالك", 10, "zoom", loadJourneyOwner),
 ];

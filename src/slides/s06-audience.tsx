@@ -5,7 +5,7 @@ import { IconBuilding, IconUsers } from "../components/Icons";
 
 export default function AudienceSlide({ step }: { step: number }) {
   const { reducedMotion } = useSlideRuntime();
-  const met = step >= 2;
+  const met = step >= 1;
   const shift = met ? 0 : 108;
 
   return (

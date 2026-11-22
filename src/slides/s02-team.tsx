@@ -79,7 +79,10 @@ export default function TeamSlide({ step }: { step: number }) {
                         alt={`صورة ${member.name}`}
                         draggable={false}
                         className="h-[236px] w-[236px] rounded-full object-cover"
-                        style={{ filter: "saturate(0.94) contrast(1.03)" }}
+                        style={{
+                          filter: "saturate(0.94) contrast(1.03)",
+                          transform: member.photoOffsetY ? `translateY(${member.photoOffsetY}px)` : undefined,
+                        }}
                       />
                       <span className="absolute -bottom-2 left-1/2 h-2 w-24 -translate-x-1/2 rounded-full bg-gold/25 blur-md" />
                     </div>

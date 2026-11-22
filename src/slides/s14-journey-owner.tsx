@@ -10,17 +10,26 @@ export default function JourneyOwnerSlide({ step }: { step: number }) {
   const { reducedMotion } = useSlideRuntime();
   const last = ownerFlow.groups.length - 1;
   const isEnd = step >= last;
+  const isThanks = step >= last + 1;
   const [showEnd, setShowEnd] = useState(false);
+  const [showThanks, setShowThanks] = useState(false);
 
   useEffect(() => {
     if (!isEnd) {
       setShowEnd(false);
+      setShowThanks(false);
       return;
     }
-    const delay = reducedMotion ? 200 : 1200;
-    const id = window.setTimeout(() => setShowEnd(true), delay);
-    return () => window.clearTimeout(id);
-  }, [isEnd, reducedMotion]);
+    setShowEnd(true);
+  }, [isEnd]);
+
+  useEffect(() => {
+    if (!isThanks) {
+      setShowThanks(false);
+      return;
+    }
+    setShowThanks(true);
+  }, [isThanks]);
 
   return (
     <FlowSlide
@@ -67,22 +76,26 @@ export default function JourneyOwnerSlide({ step }: { step: number }) {
                 transition={{ duration: reducedMotion ? 0.2 : 1.2, delay: reducedMotion ? 0 : 0.4 }}
               />
 
-              <motion.p
-                className="relative mt-6 text-[30px] font-medium text-green"
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: reducedMotion ? 0.2 : 0.8, delay: reducedMotion ? 0 : 1.1 }}
-              >
-                {site.definition}
-              </motion.p>
-              <motion.p
-                className="relative mt-2 text-[21px] text-ink-soft"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: reducedMotion ? 0.2 : 0.8, delay: reducedMotion ? 0 : 1.4 }}
-              >
-                {site.finalLine}
-              </motion.p>
+              {showThanks && (
+                <>
+                  <motion.p
+                    className="relative mt-6 text-[30px] font-medium text-green"
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: reducedMotion ? 0.2 : 0.8 }}
+                  >
+                    {site.definition}
+                  </motion.p>
+                  <motion.p
+                    className="relative mt-2 text-[21px] text-ink-soft"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: reducedMotion ? 0.2 : 0.8 }}
+                  >
+                    {site.finalLine}
+                  </motion.p>
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

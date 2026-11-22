@@ -129,6 +129,36 @@ export default function Deck() {
     return () => document.removeEventListener("fullscreenchange", onChange);
   }, []);
 
+  // wheel (scroll) navigation: down = next, up = previous
+  useEffect(() => {
+    let last = 0;
+    const onWheel = (event: WheelEvent) => {
+      if (overview || help) return;
+      const now = Date.now();
+      if (now - last < 700) return;
+      if (Math.abs(event.deltaY) < 24) return;
+      last = now;
+      event.preventDefault();
+      if (event.deltaY > 0) next();
+      else prev();
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, [help, next, overview, prev]);
+
+  // click anywhere on the stage advances one step (unless on an interactive control)
+  useEffect(() => {
+    const onClick = (event: MouseEvent) => {
+      if (overview || help) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("button, a, input, textarea, [data-no-advance]")) return;
+      next();
+    };
+    const stage = document.querySelector<HTMLElement>("[data-stage-root]")?.parentElement;
+    stage?.addEventListener("click", onClick);
+    return () => stage?.removeEventListener("click", onClick);
+  }, [help, next, overview]);
+
   // allow browser back / forward and deep links while presenting
   useEffect(() => {
     const onHash = () => {

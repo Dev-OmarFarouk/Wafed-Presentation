@@ -7,7 +7,6 @@ export default function SolutionsFirstSlide({ step }: { step: number }) {
       step={step}
       items={solutions.slice(0, 3)}
       part="١ / ٢"
-      lead="نفس التحديات، بس بترتيب ووضوح — كل حاجة في مكانها."
     />
   );
 }

@@ -5,12 +5,12 @@ import { LeavesFrame } from "../components/Leaves";
 import { useSlideRuntime } from "../engine/runtime";
 import { IconHome, IconPin } from "../components/Icons";
 
-/** percentages over the logo artwork: house roof, pin body, gold path, the waw void */
+/** percentages over the logo artwork: house, waw spiral, golden path (dangling), pin head */
 const HOTSPOTS: Record<string, { x: number; y: number }> = {
-  house: { x: 50, y: 9 },
-  waw: { x: 50, y: 20 },
-  path: { x: 50, y: 33 },
-  pin: { x: 17, y: 42 },
+  house: { x: 50, y: 22 },
+  waw: { x: 40, y: 32 },
+  path: { x: 34, y: 70 },
+  pin: { x: 50, y: 14 },
 };
 
 const ICONS = { house: IconHome, pin: IconPin } as const;
@@ -189,18 +189,6 @@ export default function Logoslide({ step }: { step: number }) {
               className="h-full w-auto select-none"
             />
 
-            {/* dim everything except the part we are talking about */}
-            {spot && (
-              <motion.div
-                className="pointer-events-none absolute inset-0"
-                initial={false}
-                animate={{ opacity: 1 }}
-                style={{
-                  background: `radial-gradient(circle at ${spot.x}% ${spot.y}%, rgba(253,250,243,0) 0 46px, rgba(253,250,243,0.5) 80px, rgba(253,250,243,0.82) 122px)`,
-                }}
-              />
-            )}
-
             {spot && (
               <span
                 className="pointer-events-none absolute"
@@ -255,13 +243,14 @@ export default function Logoslide({ step }: { step: number }) {
               const entry = ENTRIES.find((item) => item.id === arrow.id);
               if (!entry) return null;
               const visible = step > entry.order;
+              if (!visible) return null;
               const isActive = entry.order === activeIndex;
               return (
                 <path
                   key={arrow.id}
                   d={arrow.d}
                   stroke={isActive ? "#b8853f" : "#0f5e58"}
-                  strokeOpacity={isActive ? 1 : visible ? 0.32 : 0.1}
+                  strokeOpacity={isActive ? 1 : 0.32}
                   strokeWidth={isActive ? 2.6 : 2}
                   strokeDasharray="7 7"
                   strokeLinecap="round"

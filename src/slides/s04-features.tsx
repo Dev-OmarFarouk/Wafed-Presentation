@@ -26,13 +26,13 @@ export default function FeaturesSlide({ step }: { step: number }) {
         </span>
       </div>
 
-      <div className="relative mt-8 grid flex-1 grid-cols-5 gap-4">
+      <div className="relative mt-6 grid flex-1 grid-cols-5 gap-3">
         {features.map((feature, index) => {
           const active = step > index;
           return (
             <motion.article
               key={feature.id}
-              className="relative flex flex-col justify-between overflow-hidden rounded-[28px] border bg-[#fffdf8] px-6 py-7"
+              className="relative flex flex-col overflow-hidden rounded-[24px] border bg-[#fffdf8] px-5 py-5"
               initial={false}
               animate={{
                 opacity: active ? 1 : 0.3,
@@ -46,21 +46,19 @@ export default function FeaturesSlide({ step }: { step: number }) {
             >
               <div className="flex items-start justify-between">
                 <span
-                  className={`grid h-16 w-16 place-items-center rounded-2xl ${
+                  className={`grid h-12 w-12 place-items-center rounded-xl ${
                     active ? "bg-gold/12 text-gold-600" : "bg-green/8 text-green/60"
                   }`}
                 >
-                  <FeatureGlyph id={feature.icon} active={active} reduced={reducedMotion} size={30} />
+                  <FeatureGlyph id={feature.icon} active={active} reduced={reducedMotion} size={22} />
                 </span>
                 <span className="num text-[20px] font-bold text-gold/70">0{index + 1}</span>
               </div>
 
-              <div className="mt-6">
-                <h3 className="text-[29px] font-bold leading-snug text-green-deep">{feature.title}</h3>
-                <p className="mt-3 text-[21px] leading-relaxed text-ink-soft">{feature.note}</p>
+              <div className="mt-3">
+                <h3 className="text-[22px] font-bold leading-snug text-green-deep">{feature.title}</h3>
+                <p className="mt-1.5 text-[16px] leading-relaxed text-ink-soft">{feature.note}</p>
               </div>
-
-              <span className="pointer-events-none absolute -bottom-12 -left-10 h-28 w-28 rounded-full bg-gold/8" />
             </motion.article>
           );
         })}

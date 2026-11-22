@@ -12,7 +12,7 @@ export function SolutionsSlide({
   step: number;
   items: Solution[];
   part: string;
-  lead: string;
+  lead?: string;
 }) {
   const { reducedMotion } = useSlideRuntime();
 
@@ -25,7 +25,7 @@ export function SolutionsSlide({
             إزاي حللناها
           </span>
           <h2 className="title-lg mt-4">الحلول التي يقدمها وافد</h2>
-          <p className="lead mt-2 max-w-[900px]">{lead}</p>
+          {lead && <p className="lead mt-2 max-w-[900px]">{lead}</p>}
         </div>
         <span className="num mb-3 rounded-full border border-gold/30 bg-gold/8 px-6 py-2 text-[20px] text-gold-600">
           {part}

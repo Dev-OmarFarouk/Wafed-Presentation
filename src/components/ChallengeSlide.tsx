@@ -22,7 +22,7 @@ export function ChallengeSlide({
   step: number;
 }) {
   const { reducedMotion } = useSlideRuntime();
-  const shown = Math.min(items.length, Math.max(1, step));
+  const shown = Math.min(items.length, Math.max(0, step));
 
   const rightItems = items.filter((_, index) => index % 2 === 0);
   const leftItems = items.filter((_, index) => index % 2 === 1);
@@ -64,7 +64,7 @@ export function ChallengeSlide({
         <p className="mb-3 max-w-[640px] text-[24px] leading-relaxed text-ink-soft">{subtitle}</p>
       </div>
 
-      <div className="relative mt-4 grid flex-1 grid-cols-[minmax(0,1fr)_452px_minmax(0,1fr)] items-center gap-4">
+      <div className="relative mt-4 grid flex-1 grid-cols-[minmax(0,1fr)_452px_minmax(0,1fr)] items-center gap-2">
         <div className="flex flex-col items-start gap-4">
           {rightItems.map((item, index) => renderItem(item, index * 2))}
         </div>
