@@ -40,6 +40,8 @@ function preloadImage(src: string): Promise<void> {
     img.src = src;
     // already in the http cache: no load event will fire
     if (img.complete) finish();
+    // a stalled request must never hold the deck behind the loader
+    window.setTimeout(finish, 12000);
   });
 }
 
@@ -47,6 +49,7 @@ export function Boot({ children }: { children: ReactNode }) {
   const [progress, setProgress] = useState(0);
   const [hidden, setHidden] = useState(false);
   const [removed, setRemoved] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,7 +79,12 @@ export function Boot({ children }: { children: ReactNode }) {
         setHidden(true);
         // guarantee removal even if the opacity transition is frozen (e.g. backgrounded tab)
         window.setTimeout(() => {
-          if (!cancelled) setRemoved(true);
+          if (!cancelled) {
+            setRemoved(true);
+            // mount the deck only after the loader is gone, so the intro
+            // timeline starts on screen instead of running behind the loader
+            setReady(true);
+          }
         }, 750);
       }, remaining);
     });
@@ -90,7 +98,7 @@ export function Boot({ children }: { children: ReactNode }) {
 
   return (
     <>
-      {children}
+      {ready ? children : null}
 
       {!removed && (
       <div

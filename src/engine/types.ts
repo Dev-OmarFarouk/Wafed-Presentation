@@ -1,6 +1,13 @@
 import type { ComponentType, LazyExoticComponent } from "react";
 
-export type TransitionKind = "goldPath" | "circle" | "zoom" | "parallax" | "shared" | "curtain";
+export type TransitionKind =
+  | "goldPath"
+  | "circle"
+  | "zoom"
+  | "parallax"
+  | "shared"
+  | "curtain"
+  | "fold";
 
 export type SlideProps = {
   step: number;

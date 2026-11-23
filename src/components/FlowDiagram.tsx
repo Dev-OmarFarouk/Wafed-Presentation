@@ -296,6 +296,7 @@ export function FlowDiagram({
 
   return (
     <div
+      data-no-advance
       className={`relative cursor-grab overflow-hidden active:cursor-grabbing ${className}`}
       style={{ touchAction: "none" }}
       onPointerDown={onDragStart}

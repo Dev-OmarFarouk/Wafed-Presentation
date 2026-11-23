@@ -3,56 +3,50 @@ import { motion } from "framer-motion";
 import { identity } from "../data/identity";
 import { LeavesFrame } from "../components/Leaves";
 import { useSlideRuntime } from "../engine/runtime";
-import { IconHome, IconPin } from "../components/Icons";
 
-/** percentages over the logo artwork: house, waw spiral, golden path (dangling), pin head */
-const HOTSPOTS: Record<string, { x: number; y: number }> = {
-  house: { x: 50, y: 22 },
-  waw: { x: 40, y: 32 },
-  path: { x: 34, y: 70 },
-  pin: { x: 50, y: 14 },
+/** order follows the logo presentation: pin, house, waw, golden path */
+const ORDER = ["pin", "house", "waw", "path"] as const;
+
+/** percentages over the logo artwork */
+const HOTSPOTS: Record<(typeof ORDER)[number], { x: number; y: number }> = {
+  pin: { x: 65, y: 37 },
+  house: { x: 47, y: 29 },
+  waw: { x: 50, y: 12 },
+  path: { x: 38, y: 55 },
 };
 
-const ICONS = { house: IconHome, pin: IconPin } as const;
+const ARROW_COLORS: Record<(typeof ORDER)[number], string> = {
+  pin: "#d6b07a",
+  house: "#d6b07a",
+  waw: "#d6b07a",
+  path: "#d6b07a",
+};
 
-/** card layout: two on the right, two on the left, ordered by where their part sits */
-const CALL_OUTS = [
-  { id: "house", side: "right" as const },
-  { id: "waw", side: "right" as const },
-  { id: "path", side: "left" as const },
-  { id: "pin", side: "left" as const },
-];
-
-type Element = (typeof identity.elements)[number];
-type Entry = { id: string; side: "right" | "left"; order: number; element: Element };
-
-const ENTRIES: Entry[] = CALL_OUTS.map((callout) => {
-  const order = identity.elements.findIndex((item) => item.id === callout.id);
-  return { id: callout.id, side: callout.side, order, element: identity.elements[order] };
-}).filter((entry) => Boolean(entry.element));
-
-type Arrow = { id: string; d: string };
+const ELEMENTS = ORDER.map((id) => identity.elements.find((element) => element.id === id)).filter(
+  (element): element is (typeof identity.elements)[number] => Boolean(element)
+);
 
 export default function Logoslide({ step }: { step: number }) {
   const { reducedMotion } = useSlideRuntime();
-  const activeIndex = Math.min(ENTRIES.length - 1, Math.max(0, step - 1));
-  const active = ENTRIES[activeIndex];
-  const spot = active ? HOTSPOTS[active.id] : null;
+  const activeIndex = step <= 0 ? -1 : Math.min(ELEMENTS.length - 1, step - 1);
+  const active = activeIndex >= 0 ? ELEMENTS[activeIndex] : null;
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLImageElement>(null);
-  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  const [size, setSize] = useState({ w: 0, h: 0 });
-  const [arrows, setArrows] = useState<Arrow[]>([]);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [arrow, setArrow] = useState<{ d: string; color: string } | null>(null);
 
   const compute = useCallback(() => {
     const wrap = wrapRef.current;
     const logo = logoRef.current;
-    if (!wrap || !logo) return;
+    const card = cardRef.current;
+    if (!wrap || !logo || !card || !active) {
+      setArrow(null);
+      return;
+    }
     const wrapRect = wrap.getBoundingClientRect();
     if (!wrapRect.width || !wrap.offsetWidth) return;
-    // screen px -> stage px (the whole deck is scaled to fit the window)
+    // screen px -> stage px (the deck is scaled to fit the window)
     const k = wrapRect.width / wrap.offsetWidth;
     const logoRect = logo.getBoundingClientRect();
     const logoW = logoRect.width / k;
@@ -60,41 +54,29 @@ export default function Logoslide({ step }: { step: number }) {
     const logoX = (logoRect.left - wrapRect.left) / k;
     const logoY = (logoRect.top - wrapRect.top) / k;
 
-    const next: Arrow[] = [];
+    const cardRect = card.getBoundingClientRect();
+    const x0 = (cardRect.left - wrapRect.left) / k - 6;
+    const y0 = (cardRect.top + cardRect.height / 2 - wrapRect.top) / k;
 
-    for (const entry of ENTRIES) {
-      const card = cardRefs.current[entry.id];
-      const point = HOTSPOTS[entry.id];
-      if (!card || !point) continue;
+    const spot = HOTSPOTS[ORDER[activeIndex]];
+    const x1 = logoX + (logoW * spot.x) / 100;
+    const y1 = logoY + (logoH * spot.y) / 100;
 
-      const cardRect = card.getBoundingClientRect();
-      const x0 = ((entry.side === "right" ? cardRect.left : cardRect.right) - wrapRect.left) / k;
-      const y0 = (cardRect.top + cardRect.height / 2 - wrapRect.top) / k;
+    const dx = x1 - x0;
+    const dy = y1 - y0;
+    const len = Math.hypot(dx, dy) || 1;
+    const ex = x1 - (dx / len) * 44;
+    const ey = y1 - (dy / len) * 44;
+    const c1 = x0 + dx * 0.38;
+    const c2 = ex - dx * 0.2;
 
-      const x1 = logoX + (logoW * point.x) / 100;
-      const y1 = logoY + (logoH * point.y) / 100;
-
-      const dx = x1 - x0;
-      const dy = y1 - y0;
-      const len = Math.hypot(dx, dy) || 1;
-      // stop short of the ring so the arrowhead sits just outside the highlight
-      const ex = x1 - (dx / len) * 56;
-      const ey = y1 - (dy / len) * 56;
-
-      const c1 = x0 + dx * 0.42;
-      const c2 = ex - dx * 0.26;
-
-      next.push({
-        id: entry.id,
-        d: `M ${x0.toFixed(1)} ${y0.toFixed(1)} C ${c1.toFixed(1)} ${y0.toFixed(1)}, ${c2.toFixed(
-          1
-        )} ${ey.toFixed(1)}, ${ex.toFixed(1)} ${ey.toFixed(1)}`,
-      });
-    }
-
-    setSize({ w: wrap.offsetWidth, h: wrap.offsetHeight });
-    setArrows(next);
-  }, []);
+    setArrow({
+      d: `M ${x0.toFixed(1)} ${y0.toFixed(1)} C ${c1.toFixed(1)} ${y0.toFixed(1)}, ${c2.toFixed(
+        1
+      )} ${ey.toFixed(1)}, ${ex.toFixed(1)} ${ey.toFixed(1)}`,
+      color: ARROW_COLORS[ORDER[activeIndex]],
+    });
+  }, [active, activeIndex]);
 
   useLayoutEffect(() => {
     compute();
@@ -104,7 +86,7 @@ export default function Logoslide({ step }: { step: number }) {
     if (wrap) observer?.observe(wrap);
 
     const raf = requestAnimationFrame(compute);
-    const timer = window.setTimeout(compute, 450);
+    const timer = window.setTimeout(compute, 420);
     void document.fonts?.ready.then(() => compute());
 
     return () => {
@@ -113,46 +95,6 @@ export default function Logoslide({ step }: { step: number }) {
       window.clearTimeout(timer);
     };
   }, [compute]);
-
-  const renderCard = (entry: Entry) => {
-    const visible = step > entry.order;
-    const isActive = entry.order === activeIndex;
-    const Icon = ICONS[entry.id as keyof typeof ICONS];
-    const element = entry.element;
-
-    return (
-      <motion.div
-        key={entry.id}
-        ref={(node: HTMLDivElement | null) => {
-          cardRefs.current[entry.id] = node;
-        }}
-        className="relative w-full max-w-[420px] rounded-[24px] border bg-[#fffdf8]/95 px-6 py-5"
-        initial={false}
-        animate={{
-          opacity: visible ? 1 : 0.22,
-          borderColor: isActive ? "rgba(202,156,94,0.85)" : "rgba(202,156,94,0.28)",
-          boxShadow: isActive
-            ? "0 22px 44px -30px rgba(184,133,63,0.8)"
-            : "0 0 0 0 rgba(0,0,0,0)",
-        }}
-        transition={{ duration: reducedMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <div className="flex items-center gap-3">
-          {Icon ? (
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gold/12 text-gold-600">
-              <Icon size={20} />
-            </span>
-          ) : (
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gold/12 text-[18px] font-bold text-gold-600">
-              {entry.id === "path" ? "↗" : "و"}
-            </span>
-          )}
-          <h3 className="text-[27px] font-bold text-green-deep">{element.title}</h3>
-        </div>
-        <p className="mt-2 text-[21px] leading-snug text-ink-soft">{element.text}</p>
-      </motion.div>
-    );
-  };
 
   return (
     <div className="slide-inner overflow-hidden">
@@ -172,46 +114,86 @@ export default function Logoslide({ step }: { step: number }) {
 
       <div
         ref={wrapRef}
-        className="relative mx-auto mt-3 grid w-full max-w-[1420px] flex-1 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-10"
+        className="relative mx-auto mt-3 grid w-full max-w-[1500px] flex-1 grid-cols-[minmax(0,1fr)_520px_minmax(0,1fr)] items-center gap-12"
       >
-        <div className="relative z-20 flex flex-col items-end gap-8">
-          {ENTRIES.filter((entry) => entry.side === "right").map(renderCard)}
-        </div>
-
-        <div className="relative flex h-full items-center justify-center">
-          <div className="relative h-[520px]">
-            <img
-              ref={logoRef}
-              src="/assets/logo.png"
-              alt="شعار وافد"
-              draggable={false}
-              onLoad={compute}
-              className="h-full w-auto select-none"
-            />
-
-            {spot && (
-              <span
-                className="pointer-events-none absolute"
-                style={{ left: `${spot.x}%`, top: `${spot.y}%`, transform: "translate(-50%, -50%)" }}
-              >
-                <span className="block h-[74px] w-[74px] rounded-full border-2 border-dashed border-gold/90" />
-                <span className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold shadow-[0_0_0_6px_rgba(202,156,94,0.22)]" />
-              </span>
+        {/* right: the active symbol, or the intro on the overview step */}
+        <div className="relative z-20 flex flex-col items-end justify-center">
+          <motion.div
+            key={active?.id ?? "intro"}
+            ref={cardRef}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reducedMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="card relative w-full max-w-[470px] overflow-hidden px-8 py-8"
+          >
+            <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-l from-transparent via-gold/60 to-transparent" />
+            {active ? (
+              <>
+                <span dir="ltr" className="num block text-[24px] font-bold text-gold/80">
+                  {String(activeIndex + 1).padStart(2, "0")} / {String(ELEMENTS.length).padStart(2, "0")}
+                </span>
+                <h3 className="mt-3 text-[52px] font-bold leading-tight text-green-deep">
+                  {active.title}
+                </h3>
+                <p className="mt-4 text-[27px] leading-relaxed text-ink">{active.text}</p>
+              </>
+            ) : (
+              <>
+                <span className="text-[22px] font-medium text-gold-600">الشعار</span>
+                <p className="mt-3 text-[27px] leading-relaxed text-ink">{identity.logoIntro}</p>
+              </>
             )}
-          </div>
+          </motion.div>
         </div>
 
-        <div className="relative z-20 flex flex-col items-start gap-8">
-          {ENTRIES.filter((entry) => entry.side === "left").map(renderCard)}
+        {/* centre: the mark */}
+        <div className="relative flex h-full items-center justify-center">
+          <img
+            ref={logoRef}
+            src="/assets/logo.png"
+            alt="شعار وافد"
+            draggable={false}
+            onLoad={compute}
+            className="h-[620px] w-auto select-none"
+          />
         </div>
 
-        {/* leader lines: every card points at its own part of the mark */}
-        {size.w > 0 && (
+        {/* left: a quiet stepper, so the four symbols keep their context */}
+        <div className="relative z-20 flex flex-col items-start gap-3">
+          {ELEMENTS.map((element, index) => {
+            const isActive = index === activeIndex;
+            return (
+              <div
+                key={element.id}
+                className={`flex w-full max-w-[260px] items-center gap-3 rounded-2xl border px-4 py-3 transition-colors duration-300 ${
+                  isActive
+                    ? "border-gold/60 bg-[#fffdf8] shadow-[0_18px_36px_-28px_rgba(68,47,20,0.55)]"
+                    : "border-green/10 bg-[#fffdf8]/55"
+                }`}
+              >
+                <span
+                  className={`num grid h-9 w-9 shrink-0 place-items-center rounded-full text-[17px] font-bold ${
+                    isActive ? "bg-gold text-[#12332d]" : "bg-green/8 text-green/55"
+                  }`}
+                >
+                  {index + 1}
+                </span>
+                <span
+                  className={`text-[22px] font-medium ${
+                    isActive ? "text-green-deep" : "text-ink-soft/70"
+                  }`}
+                >
+                  {element.title}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* one leader line, only for the active symbol, in that symbol's colour */}
+        {arrow && (
           <svg
-            className="pointer-events-none absolute inset-0 z-10"
-            width={size.w}
-            height={size.h}
-            viewBox={`0 0 ${size.w} ${size.h}`}
+            className="pointer-events-none absolute inset-0 z-10 h-full w-full"
             fill="none"
             aria-hidden
           >
@@ -225,40 +207,21 @@ export default function Logoslide({ step }: { step: number }) {
                 markerHeight="8"
                 orient="auto"
               >
-                <path d="M0 0 L8 4 L0 8 Z" fill="#b8853f" />
-              </marker>
-              <marker
-                id="logo-arrow-soft"
-                viewBox="0 0 8 8"
-                refX="7"
-                refY="4"
-                markerWidth="7"
-                markerHeight="7"
-                orient="auto"
-              >
-                <path d="M0 0 L8 4 L0 8 Z" fill="#0f5e58" fillOpacity="0.4" />
+                <path d="M0 0 L8 4 L0 8 Z" fill={arrow.color} />
               </marker>
             </defs>
-            {arrows.map((arrow) => {
-              const entry = ENTRIES.find((item) => item.id === arrow.id);
-              if (!entry) return null;
-              const visible = step > entry.order;
-              if (!visible) return null;
-              const isActive = entry.order === activeIndex;
-              return (
-                <path
-                  key={arrow.id}
-                  d={arrow.d}
-                  stroke={isActive ? "#b8853f" : "#0f5e58"}
-                  strokeOpacity={isActive ? 1 : 0.32}
-                  strokeWidth={isActive ? 2.6 : 2}
-                  strokeDasharray="7 7"
-                  strokeLinecap="round"
-                  markerEnd={`url(#${isActive ? "logo-arrow" : "logo-arrow-soft"})`}
-                  style={{ transition: "stroke-opacity 400ms ease, stroke 400ms ease" }}
-                />
-              );
-            })}
+            <motion.path
+              key={`${active?.id}-arrow`}
+              d={arrow.d}
+              stroke={arrow.color}
+              strokeWidth={3}
+              strokeDasharray="8 8"
+              strokeLinecap="round"
+              markerEnd="url(#logo-arrow)"
+              initial={{ opacity: 0, strokeDashoffset: 30 }}
+              animate={{ opacity: 1, strokeDashoffset: 0 }}
+              transition={{ duration: reducedMotion ? 0 : 0.65, ease: "easeOut" }}
+            />
           </svg>
         )}
       </div>

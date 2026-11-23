@@ -36,10 +36,10 @@ function define(
 export const slides: SlideDef[] = [
   define("intro", "وافد", 1, "goldPath", loadIntro),
   define("team", "أعضاء الفريق", 5, "zoom", loadTeam),
-  define("challenges-student", "تحديات الطالب", 5, "shared", loadStudentChallenges),
+  define("challenges-student", "تحديات الطالب", 5, "curtain", loadStudentChallenges),
   define("challenges-owner", "تحديات صاحب السكن", 7, "parallax", loadOwnerChallenges),
-  define("solutions", "الحلول", 4, "shared", loadSolutions),
-  define("solutions-b", "الحلول", 4, "parallax", loadSolutionsB),
+  define("solutions", "الحلول", 3, "fold", loadSolutions),
+  define("solutions-b", "الحلول", 3, "parallax", loadSolutionsB),
   define("features", "الخصائص الأساسية", 6, "zoom", loadFeatures),
   define("overview", "نظرة على المشروع", 4, "parallax", loadOverview),
   define("audience", "الفئة المستهدفة", 2, "circle", loadAudience),

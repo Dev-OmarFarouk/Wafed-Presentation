@@ -40,8 +40,8 @@ export function TransitionFX({
 
     const tl = gsap.timeline({
       onComplete: () => {
-        gsap.set(inEl, { clearProps: "clipPath,transform,opacity,filter" });
-        if (outEl) gsap.set(outEl, { clearProps: "clipPath,transform,opacity,filter" });
+        gsap.set(inEl, { clearProps: "clipPath,transform,opacity,filter,perspective,transformOrigin" });
+        if (outEl) gsap.set(outEl, { clearProps: "clipPath,transform,opacity,filter,perspective,transformOrigin" });
         doneRef.current();
       },
     });
@@ -59,8 +59,8 @@ export function TransitionFX({
       tl.to(inEl, { opacity: 1, duration: 0.22, ease: "power1.out" });
       return () => {
         tl.kill();
-        gsap.set(inEl, { clearProps: "clipPath,transform,opacity,filter" });
-        if (outEl) gsap.set(outEl, { clearProps: "clipPath,transform,opacity,filter" });
+        gsap.set(inEl, { clearProps: "clipPath,transform,opacity,filter,perspective,transformOrigin" });
+        if (outEl) gsap.set(outEl, { clearProps: "clipPath,transform,opacity,filter,perspective,transformOrigin" });
       };
     }
 
@@ -131,6 +131,47 @@ export function TransitionFX({
         break;
       }
 
+      case "fold": {
+        // a single bottom-up paper fold, unique to the challenges -> solutions hand-off
+        gsap.set(inEl, {
+          opacity: 1,
+          transformOrigin: "50% 100%",
+          perspective: 1600,
+          clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
+        });
+        tl.to(
+          inEl,
+          {
+            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+            duration: 1.05,
+            ease: "power4.inOut",
+          },
+          0
+        );
+        tl.fromTo(
+          inEl,
+          { rotateX: 18, y: 110, scale: 1.035, filter: "blur(8px)" },
+          { rotateX: 0, y: 0, scale: 1, filter: "blur(0px)", duration: 1.15, ease: "expo.out" },
+          0.04
+        );
+        if (outEl) {
+          tl.to(
+            outEl,
+            {
+              y: -120,
+              rotateX: -12,
+              opacity: 0.12,
+              scale: 0.97,
+              filter: "blur(10px)",
+              duration: 0.9,
+              ease: "power2.in",
+            },
+            0
+          );
+        }
+        break;
+      }
+
       case "curtain": {
         gsap.set(inEl, { clipPath: "inset(0 0 100% 0)", opacity: 1 });
         tl.to(inEl, { clipPath: "inset(0 0 0% 0)", duration: 0.8, ease: "power3.inOut" }, 0);
@@ -152,8 +193,8 @@ export function TransitionFX({
 
     return () => {
       tl.kill();
-      gsap.set(inEl, { clearProps: "clipPath,transform,opacity,filter" });
-      if (outEl) gsap.set(outEl, { clearProps: "clipPath,transform,opacity,filter" });
+      gsap.set(inEl, { clearProps: "clipPath,transform,opacity,filter,perspective,transformOrigin" });
+      if (outEl) gsap.set(outEl, { clearProps: "clipPath,transform,opacity,filter,perspective,transformOrigin" });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
